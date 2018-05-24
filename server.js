@@ -17,6 +17,54 @@ const knex = require('knex')(config);
 let bcrypt = require('bcrypt');
 const saltRounds = 10;
 
+// Get all boards
+app.get('/api/:user_id/boards', (req, res) => {
+    const user_id = req.params.user_id;
+    console.log(`getting all boards for ${user_id}`);
+    knex('boards').where({ user_id }).then(boards => {
+        res.status(200).json({ boards })
+    }).catch(error => {
+        res.status(500).json({ error });
+    })
+});
+
+// Get a specific board
+app.get('/api/:user_id/boards/:board_id', (req, res) => {
+    const user_id = req.params.user_id;
+    const id = req.params.board_id;
+    console.log(`getting board ${id} for ${user_id}`);
+    knex('boards').where({ user_id }).andWhere({ id }).then(boards => {
+        const board = boards[0];
+        res.status(200).json({ board })
+    }).catch(error => {
+        res.status(500).json({ error });
+    })
+});
+
+// Create a new board
+app.post('/api/:user_id/boards', (req, res) => {
+    if (!req.body.title)
+        return res.status(400).send();
+    let user_id = parseInt(req.params.id);
+    knex('users').where({ id: user_id }).first().then(user => {
+        return knex('boards').insert({
+            user_id,
+            title: req.body.title,
+            description: req.body.description,
+            tree: req.body.tree
+        })
+    }).then(ids => {
+        return knex('boards').where('id', ids[0]).first();
+    }).then(board => {
+        res.status(200).json({ board });
+    }).catch(error => {
+        res.status(500).json({ error });
+    });
+});
+
+// Update a board
+
+// Login
 app.post('/api/login', (req, res) => {
     if (!req.body.email || !req.body.password)
         return res.status(400).send();
@@ -40,6 +88,8 @@ app.post('/api/login', (req, res) => {
     });
 });
 
+
+// Register
 app.post('/api/users', (req, res) => {
     if (!req.body.email || !req.body.password || !req.body.first_name || !req.body.last_name)
         return res.status(400).send();

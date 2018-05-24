@@ -8,15 +8,19 @@ Vue.use(Vuex);
 export default new Vuex.Store({
     state: {
         user: {},
+        boards: [],
         loggedIn: false,
         loginError: '',
         registerError: '',
+        generalError: ''
     },
     getters: {
         user: state => state.user,
         loggedIn: state => state.loggedIn,
         loginError: state => state.loginError,
         registerError: state => state.registerError,
+        generalError: state => state.generalError,
+        boards: state => state.boards
     },
     mutations: {
         setUser(state, user) {
@@ -30,10 +34,16 @@ export default new Vuex.Store({
         },
         setRegisterError(state, message) {
             state.registerError = message;
+        },
+        setGeneralError(state, message) {
+            state.generalError = message;
+        },
+        setBoards(state, boards) {
+            state.boards = boards;
         }
     },
     actions: {
-        // Registration, Login //
+        // Register
         register(context, user) {
             axios.post("/api/users", user).then(response => {
                 context.commit('setUser', response.data.user);
@@ -51,6 +61,7 @@ export default new Vuex.Store({
                 context.commit('setRegisterError', "Sorry, your request failed. We will look into it.");
             });
         },
+        // Login
         login(context, user) {
             axios.post("/api/login", user).then(response => {
                 context.commit('setUser', response.data.user);
@@ -68,9 +79,25 @@ export default new Vuex.Store({
                 context.commit('setLoginError', "Sorry, your request failed. We will look into it.");
             });
         },
-        logout(context,user) {
+        // Logout
+        logout(context, user) {
             context.commit('setUser', {});
-            context.commit('setLogin',false);
+            context.commit('setLogin', false);
+        },
+        // Get all boards for current user
+        getBoards(context) {
+            axios.get(`/api/${context.state.user.id}/boards`).then(response => {
+                context.commit('setBoards', response.data.boards);
+                console.log(response)
+            }).catch(error => {
+                context.commit('setGeneralError', "");
+                if (error.response) {
+                    if (error.response.status === 403 || error.response.status === 400)
+                        context.commit('setGeneralError', `Error retrieving boards ${error.response}`);
+                    return;
+                }
+                context.commit('setGeneralError', "Sorry, we couldn't complete your request. We will look into it.");
+            });
         },
     }
 });
