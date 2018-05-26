@@ -1,8 +1,8 @@
 <template>
   <div>
     <div v-if="loggedIn">
-      You are logged in! Here is a list of your boards:
-      <boards />
+      <boards v-if="!currentBoard"/>
+      <structure v-else /></stucture> 
     </div>
     <div v-else>
       <welcome-page/>
@@ -13,12 +13,16 @@
 <script>
 import WelcomePage from './WelcomePage';
 import Boards from './Boards'
+import Structure from './Structure'
 export default {
   name: "HomePage",
-  components: { WelcomePage, Boards },
+  components: { WelcomePage, Boards, Structure },
   computed: {
     loggedIn: function() {
       return this.$store.getters.loggedIn;
+    },
+    currentBoard: function() {
+      return this.$store.getters.currentBoard;
     }
   }
 };

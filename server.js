@@ -45,8 +45,10 @@ app.get('/api/:user_id/boards/:board_id', (req, res) => {
 app.post('/api/:user_id/boards', (req, res) => {
     if (!req.body.title)
         return res.status(400).send();
-    let user_id = parseInt(req.params.id);
-    knex('users').where({ id: user_id }).first().then(user => {
+    let user_id = parseInt(req.params.user_id);
+    console.log(`User id is ${user_id}`);
+    knex('users').where({ id: user_id }).then(user => {
+        console.log(`User #${user} found.`)
         return knex('boards').insert({
             user_id,
             title: req.body.title,
@@ -54,15 +56,42 @@ app.post('/api/:user_id/boards', (req, res) => {
             tree: req.body.tree
         })
     }).then(ids => {
+        console.log('Inserted successfully')
         return knex('boards').where('id', ids[0]).first();
     }).then(board => {
         res.status(200).json({ board });
     }).catch(error => {
+        console.log(`There was an error ${error}`);
         res.status(500).json({ error });
     });
 });
 
 // Update a board
+app.put('/api/user_id/boards/:board_id', (req, res) => {
+    if (!req.body.tree)
+        return res.status(400).send('You must create a structure');
+    const user_id = req.params.user_id;
+    const id = req.params.board_id;
+    const tree = req.body.tree;
+    console.log(`updating board ${id} for user ${user_id}`);
+    knex('boards').where({ user_id }).andWhere({ id }).then(boards => {
+        const board = boards[0];
+        if (!board) {
+            res.status(404).send('Sorry, we couldn\'t find that board in your list.')
+            throw new Error('Bad request');
+        } else if (board.tree = req.body.tree) {
+            res.status(304).send('Already up to date!')
+            return Promise.resolve(null);
+        } else {
+            return knex('boards').where({ id: board.id }).update({ tree });
+        }
+        res.status(200).json({ board })
+    }).then(response => {
+        res.status(200).json({ response })
+    }).catch(error => {
+        res.status(500).json({ error });
+    })
+})
 
 // Login
 app.post('/api/login', (req, res) => {

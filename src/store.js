@@ -9,6 +9,7 @@ export default new Vuex.Store({
     state: {
         user: {},
         boards: [],
+        currentBoard: undefined,
         loggedIn: false,
         loginError: '',
         registerError: '',
@@ -20,7 +21,8 @@ export default new Vuex.Store({
         loginError: state => state.loginError,
         registerError: state => state.registerError,
         generalError: state => state.generalError,
-        boards: state => state.boards
+        boards: state => state.boards,
+        currentBoard: state => state.currentBoard
     },
     mutations: {
         setUser(state, user) {
@@ -40,6 +42,10 @@ export default new Vuex.Store({
         },
         setBoards(state, boards) {
             state.boards = boards;
+            console.log(state.boards);
+        },
+        setCurrentBoard(state, currentBoard) {
+            state.currentBoard = currentBoard;
         }
     },
     actions: {
@@ -99,5 +105,19 @@ export default new Vuex.Store({
                 context.commit('setGeneralError', "Sorry, we couldn't complete your request. We will look into it.");
             });
         },
+        createBoard(context, board) {
+            axios.post(`/api/${context.state.user.id}/boards`, board).then(response => {
+                console.log(response.data.board)
+                if (response.data.board)
+                    context.commit('setBoards', context.state.boards.concat(response.data.board));
+            }).catch(error => {
+                context.commit('setGeneralError', "");
+                if (error.response) {
+                    if (error.response.status === 403 || error.response.status === 400)
+                        context.commit('setGeneralError', `Error retrieving boards ${error.response}`);
+                    return;
+                }
+            })
+        }
     }
 });
