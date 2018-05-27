@@ -9,7 +9,7 @@ export default new Vuex.Store({
     state: {
         user: {},
         boards: [],
-        currentBoard: undefined,
+        currentBoard: {},
         loggedIn: false,
         loginError: '',
         registerError: '',
@@ -42,7 +42,6 @@ export default new Vuex.Store({
         },
         setBoards(state, boards) {
             state.boards = boards;
-            console.log(state.boards);
         },
         setCurrentBoard(state, currentBoard) {
             state.currentBoard = currentBoard;
@@ -94,7 +93,6 @@ export default new Vuex.Store({
         getBoards(context) {
             axios.get(`/api/${context.state.user.id}/boards`).then(response => {
                 context.commit('setBoards', response.data.boards);
-                console.log(response)
             }).catch(error => {
                 context.commit('setGeneralError', "");
                 if (error.response) {
@@ -107,7 +105,6 @@ export default new Vuex.Store({
         },
         createBoard(context, board) {
             axios.post(`/api/${context.state.user.id}/boards`, board).then(response => {
-                console.log(response.data.board)
                 if (response.data.board)
                     context.commit('setBoards', context.state.boards.concat(response.data.board));
             }).catch(error => {

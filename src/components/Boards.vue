@@ -15,7 +15,6 @@ export default {
   name: "Boards",
   computed: {
     boards: function() {
-      console.log("boards changed");
       return this.$store.getters.boards;
     }
   },
