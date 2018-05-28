@@ -32,4 +32,11 @@ export default {
 </script>
 
 <style scoped>
+.tree {
+    background-color: #222;
+}
+
+.alt .tree {
+    background-color: #fff;
+}
 </style>

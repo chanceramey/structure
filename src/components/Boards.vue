@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="boards">
       <h1>You are logged in! Here is a list of your boards:</h1>
       <div v-for="(board, index) in boards" v-on:click="choose(board)">{{index+1}}. {{board['title']}}: {{board['description'] && board['description']}}</div>
       <div>

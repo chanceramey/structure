@@ -111,7 +111,18 @@ export default new Vuex.Store({
                 context.commit('setGeneralError', "");
                 if (error.response) {
                     if (error.response.status === 403 || error.response.status === 400)
-                        context.commit('setGeneralError', `Error retrieving boards ${error.response}`);
+                        context.commit('setGeneralError', `Error creating board ${error.response}`);
+                    return;
+                }
+            })
+        },
+        saveBoard(context, board) {
+            axios.put(`/api/${context.state.user.id}/boards/${board.id}`, board).then(response => {
+
+            }).catch(error => {
+                if (error.response) {
+                    if (error.response.status === 403 || error.response.status === 400)
+                        context.commit('setGeneralError', `Error saving board ${error.response}`);
                     return;
                 }
             })

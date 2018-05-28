@@ -3,11 +3,10 @@ import Node from "./Node";
 
 export default Vue.component("Tree", {
     render: function (h) {
-        let node = this.generateTree(h, "test", "description");
-        console.log(node)
+        let tree = this.generateTree(h, "test", "description");
         return (
-            <div>
-                {node}
+            <div class="tree">
+                {tree}
             </div>
         );
     },
@@ -29,29 +28,17 @@ export default Vue.component("Tree", {
                             title: "Child 1",
                             description: "Description for child 1",
                             children: [{
-                                title: "Only Grandchild",
+                                title: "First Grandchild",
+                                description: "Description for only grandchild"
+                            },
+                            {
+                                title: "Second Grandchild",
+                                description: "Description for only grandchild"
+                            },
+                            {
+                                title: "Third Grandchild",
                                 description: "Description for only grandchild"
                             }]
-                        },
-                        {
-                            title: "Child 2",
-                            description: "Description for child 2",
-                            children: []
-                        }
-                    ]
-                }
-            },
-            testBoard2: {
-                title: "Test Board",
-                description: "Testing board",
-                root: {
-                    title: "Root Node",
-                    description: "Description for root",
-                    children: [
-                        {
-                            title: "Child 1",
-                            description: "Description for child 1",
-                            children: []
                         },
                         {
                             title: "Child 2",
@@ -70,6 +57,11 @@ export default Vue.component("Tree", {
         generateTree: function (h) {
             return this.treeHelper(h, this.testBoard.root)
         },
+        updateNode: function (nodeObject, newNodeValues) {
+            if (newNodeValues.title) nodeObject.title = newNodeValues.title;
+            if (newNodeValues.description) nodeObject.description = newNodeValues.description;
+            console.log(JSON.stringify(this.testBoard, null, 4));
+        },
         treeHelper: function (h, node) {
             if (!node) return;
             let children = [];
@@ -79,7 +71,7 @@ export default Vue.component("Tree", {
                 }
             }
             return (
-                <Node title={node.title} description={node.description}>
+                <Node node={node} update={this.updateNode}>
                     {children}
                 </Node>
             )

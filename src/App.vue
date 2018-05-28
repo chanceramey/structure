@@ -1,5 +1,5 @@
 <template>
-  <div id="app">
+  <div id="app" class="">
     <app-header/>
     <router-view/>
   </div>
@@ -66,5 +66,9 @@
  }
  .column {
      width: 800px;
+ }
+
+ body .alt {
+     background-color: #fff;
  }
 </style>
