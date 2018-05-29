@@ -12,21 +12,23 @@
                   v-on:change="update(node, {title: dataTitle})"
                   @keydown.shift.tab.prevent="toggleDescription(true)"
                   @click="toggleDescription(false)"
-                  :disabled="!parent"/>
+                  :disabled="!parent"
+                  :ref="titleId"/>
                 <textarea class="description" 
                   type="textarea" 
                   v-if="showDescription || dataDescription" 
                   v-model="dataDescription" 
                   v-on:change="update(node, {description: dataDescription})"
                   @click="toggleDescription(true)"
-                  disabled="!parent"/>
+                  :disabled="!parent"
+                  :ref="descriptionId"/>
             </div>
             <div class="controls">
                 <div class="addChild" v-if="parent" v-on:click="addSibling(parent)">
                   >
                 </div>
                 <div class="addChild" v-if="parent" v-on:click="deleteNode(parent, index)">
-                  --
+                  -
                 </div>
                 <div class="addChild" v-on:click="addChild(node)">
                     +
@@ -42,11 +44,17 @@
 
 <script>
 import FontAwesomeIcon from "@fortawesome/vue-fontawesome";
+import uid from 'uid';
+
 export default {
   name: "Node",
   components: { FontAwesomeIcon },
   created: function () {
-
+    this.titleId = uid();
+    this.descriptionId = uid();
+  },
+  mounted: function () {
+    this.$refs[this.titleId].focus();
   },
   data: function() {
     return {
@@ -54,7 +62,8 @@ export default {
       dataDescription: this.node.description.slice(0),
       dragging: false,
       showDescription: false,
-      titleId: ''
+      titleId: '',
+      descriptionId: ''
     };
   },
   methods: {
@@ -63,6 +72,9 @@ export default {
         this.showDescription = value;
       } else if (!this.showDescription) {
         this.showDescription = value;
+        console.log(this.$refs[this.descriptionId], this.$refs, this.descriptionId)
+        this.$refs[this.descriptionId].focus();
+
       }
     },
     drag (ev){
@@ -165,7 +177,6 @@ textarea:focus {
   justify-content: center;
 }
 .title {
-  overflow: hidden;
   flex-grow: 1;
   padding: 10px;
   background-color: #fff;

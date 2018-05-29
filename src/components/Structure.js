@@ -5,7 +5,7 @@ import Node from "./Node";
 // Immediately 
 // X Create a board should take you directly to the board
 // X Start with title only, create a description on 'TAB'
-// * Save (w/ autosave) or prompt save (w/out autosave) on logout
+// * Save (w/ autosave) or prompt save (w/out autosave) on logout (on Enter?)
 // X Create a sibling with 'ENTER'
 // X Create a child with 'SHIFT-ENTER'
 // * Control how to tabbing through tree works
@@ -54,6 +54,8 @@ import Node from "./Node";
 // * Determine paid features?
 // * Add payments?
 // * Create a developer API
+// * Make Control/Command+s save
+// * Make Control/Command+p Print Report
 
 export default Vue.component("Structure", {
     render: function (h) {
