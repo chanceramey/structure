@@ -23,7 +23,7 @@ export default new Vuex.Store({
         generalError: state => state.generalError,
         boards: state => state.boards,
         currentBoard: state => state.currentBoard,
-        currentStructure: state => state.currentBoard && JSON.parse(state.currentBoard.structure)
+        currentStructure: state => state.currentBoard &&  state.currentBoard.structure && JSON.parse(state.currentBoard.structure)
     },
     mutations: {
         setUser(state, user) {
@@ -89,6 +89,7 @@ export default new Vuex.Store({
         logout(context, user) {
             context.commit('setUser', {});
             context.commit('setLogin', false);
+            context.commit('setCurrentBoard', undefined)
         },
         // Get all boards for current user
         getBoards(context) {
@@ -108,6 +109,7 @@ export default new Vuex.Store({
             axios.post(`/api/${context.state.user.id}/boards`, board).then(response => {
                 if (response.data.board)
                     context.commit('setBoards', context.state.boards.concat(response.data.board));
+                    context.commit('setCurrentBoard', response.data.board)
             }).catch(error => {
                 context.commit('setGeneralError', "");
                 if (error.response) {

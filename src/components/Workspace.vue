@@ -35,7 +35,11 @@ export default {
       const title = this.title;
       const description = this.description;
       this.$store.dispatch("createBoard", {
-        structure: { root: { title, description, children: [] } }
+        structure: { root: { title, description, children: [ {
+          title: '',
+          description: '',
+          children: []
+        } ] } }
       });
       this.title = "";
       this.description = "";

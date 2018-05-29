@@ -3,25 +3,28 @@ import Node from "./Node";
 
 // *** TODO ***
 // Immediately 
-// * Create a board should take you directly to the board
-// * Start with title only, create description on 'TAB'
-// * Create sibling with 'ENTER'
-// * Create child with 'SHIFT-ENTER'
+// X Create a board should take you directly to the board
+// X Start with title only, create a description on 'TAB'
+// * Save (w/ autosave) or prompt save (w/out autosave) on logout
+// X Create a sibling with 'ENTER'
+// X Create a child with 'SHIFT-ENTER'
+// * Control how to tabbing through tree works
+// * Focus on title when a new item is created
 // * Allow reordering of siblings
 // * Delete a parent and ask what to do with childen (delete)
 // * Fix Workspace so that it expands with structure
 // * Fix background so that the whole thing changes when building a structure (use routes?)
 // * Start showing structures from database
 // * Fix save feature
-// * Fix delete feature
+// X Fix delete feature
 // * Add lines to structures
 // * Filter all inputs to check for SQL injections
-// * * Remove board title and description and make them part of the root node
+// X Remove board title and description and make them part of the root node
 // * Add JS Web Token to front and backend
 // * Fix login password field
 // * Figure out the best way to way a todo list (allow for sub-structures/hidden structures?)
 // * Configure database to work with larger structures
-// * * Change name of tree (Structure) or Structure (Workspace?) component to remove confusion
+// X Change name of tree (Structure) or Structure (Workspace?) component to remove confusion
 // * Add generate report feature
 // * Add delete board to Boards page
 // * Restyle list of boards
@@ -29,6 +32,9 @@ import Node from "./Node";
 // * Create a version history
 // * Move to Typescript
 // * Host on the web
+// * Create instuction modal AND/OR persistent modal
+// * Add font-awesome icons
+// * Fix delete
 
 // Soon
 // * Create invite only access
@@ -61,24 +67,25 @@ export default Vue.component("Structure", {
     computed: {
         currentStructure: function () {
             return this.$store.getters.currentStructure;
-        }
+        },
     },
     created: function () {
-        console.log(JSON.stringify(this.currentStructure, null, 4));
+        this.mutableStructure = JSON.parse(JSON.stringify(this.currentStructure));
     },
     data: function () {
         return {
+            mutableStructure: {}
         }
     },
     methods: {
-        deleteMe: function (node) {
+        deleteMe: function (parent, index) {
             console.log("deleting node")
-            node = {};
-            console.log(JSON.stringify(this.currentStructure, null, 4));
+            parent && parent.children.splice(index, 1)
+            console.log(JSON.stringify(this.mutableStructure, null, 4));
 
         },
         generateStructure: function (h) {
-            return this.structureHelper(h, this.currentStructure.root)
+            return this.structureHelper(h, this.mutableStructure.root, null, null)
         },
         updateNode: function (nodeObject, newNodeValues) {
             if (newNodeValues.title) nodeObject.title = newNodeValues.title;
@@ -87,26 +94,42 @@ export default Vue.component("Structure", {
             console.log(JSON.stringify(this.testBoard, null, 4));
         },
         pushChild: function (nodeObject) {
-            console.log(`Before: ${JSON.stringify(this.currentStructure, null, 4)}`)
+            console.log(`Before: ${JSON.stringify(this.mutableStructure, null, 4)}`)
             if (!nodeObject.children) nodeObject.children = [];
             nodeObject.children.push({
                 title: '',
                 description: '',
                 children: []
             });
-            console.log(`After: ${JSON.stringify(this.currentStructure, null, 4)}`)
+            console.log(`After: ${JSON.stringify(this.mutableStructure, null, 4)}`)
 
         },
-        structureHelper: function (h, node) {
+        pushSibling: function (parent) {
+            console.log(parent)
+            parent && parent.children.push({
+                title: '',
+                description: '',
+                children: []
+            });
+            console.log(JSON.stringify(this.mutableStructure, null, 4));
+        },
+        structureHelper: function (h, node, parent, index) {
             if (!node) return;
             let children = [];
             if (node.children && node.children.length > 0) {
-                for (let child of node.children) {
-                    children.push(this.structureHelper(h, child))
+                for (let index in node.children) {
+                    let child = node.children[index];
+                    children.push(this.structureHelper(h, child, node, index));
                 }
             }
             return (
-                <Node node={node} update={this.updateNode} addChild={this.pushChild} deleteNode={this.deleteMe}>
+                <Node node={node}
+                    parent={parent}
+                    index={index}
+                    update={this.updateNode}
+                    addChild={this.pushChild}
+                    deleteNode={this.deleteMe}
+                    addSibling={this.pushSibling}>
                     {children}
                 </Node>
             )

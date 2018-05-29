@@ -1,13 +1,31 @@
 <template>
     <div class="offspring" v-if="node">
         <div class="sibling-space">
-        <div class="perimeter">
-            <div class="box">
-                <input class="title" v-model="dataTitle" v-on:change="update(node, {title: dataTitle})"/>
-                <textarea class="description" type="textarea" v-model="dataDescription" v-on:change="update(node, {description: dataDescription})"/>
+        <div class="perimeter" v-if="!dragging">
+            <div class="box" 
+              draggable="true" 
+              v-on:drag="drag()"
+              @keydown.shift.space="addChild(node)"                  
+               @keydown.shift.enter="addSibling(parent)">
+                <input class="title" 
+                  v-model="dataTitle" 
+                  v-on:change="update(node, {title: dataTitle})"
+                  @keydown.shift.tab.prevent="toggleDescription(true)"
+                  @click="toggleDescription(false)"
+                  :disabled="!parent"/>
+                <textarea class="description" 
+                  type="textarea" 
+                  v-if="showDescription || dataDescription" 
+                  v-model="dataDescription" 
+                  v-on:change="update(node, {description: dataDescription})"
+                  @click="toggleDescription(true)"
+                  disabled="!parent"/>
             </div>
             <div class="controls">
-                <div class="addChild" v-on:click="deleteNode(node)">
+                <div class="addChild" v-if="parent" v-on:click="addSibling(parent)">
+                  >
+                </div>
+                <div class="addChild" v-if="parent" v-on:click="deleteNode(parent, index)">
                   --
                 </div>
                 <div class="addChild" v-on:click="addChild(node)">
@@ -27,14 +45,43 @@ import FontAwesomeIcon from "@fortawesome/vue-fontawesome";
 export default {
   name: "Node",
   components: { FontAwesomeIcon },
+  created: function () {
+
+  },
   data: function() {
     return {
       dataTitle: this.node.title.slice(0),
-      dataDescription: this.node.description.slice(0)
+      dataDescription: this.node.description.slice(0),
+      dragging: false,
+      showDescription: false,
+      titleId: ''
     };
   },
+  methods: {
+    toggleDescription (value) {
+      if (!this.dataDescription && this.showDescription) {
+        this.showDescription = value;
+      } else if (!this.showDescription) {
+        this.showDescription = value;
+      }
+    },
+    drag (ev){
+      // this.dragging = true;
+    },
+    drop (ev) {
+      this.dragging = false;
+    }
+  },
   computed: {},
-  props: ["node", "update", "addChild", "deleteNode"]
+  props: [
+    "node",
+    "update",
+    "addChild",
+    "deleteNode",
+    "parent",
+    "addSibling",
+    "index"
+  ]
 };
 </script>
 
@@ -99,6 +146,7 @@ textarea:focus {
   flex-grow: 2;
   padding: 10px;
   font-weight: lighter;
+  min-height: 50px;
 }
 .offspring {
   margin: 5px;
@@ -118,10 +166,11 @@ textarea:focus {
 }
 .title {
   overflow: hidden;
-  flex-grow: 0;
+  flex-grow: 1;
   padding: 10px;
   background-color: #fff;
   font-weight: bold;
+  text-align: center;
 }
 
 .alt .box {
