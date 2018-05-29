@@ -1,12 +1,18 @@
 <template>
-    <div class="offspring">
+    <div class="offspring" v-if="node">
         <div class="sibling-space">
         <div class="perimeter">
             <div class="box">
                 <input class="title" v-model="dataTitle" v-on:change="update(node, {title: dataTitle})"/>
-                <textarea class="description" type="textarea" v-model="dataDescription" />
+                <textarea class="description" type="textarea" v-model="dataDescription" v-on:change="update(node, {description: dataDescription})"/>
             </div>
             <div class="controls">
+                <div class="addChild" v-on:click="deleteNode(node)">
+                  --
+                </div>
+                <div class="addChild" v-on:click="addChild(node)">
+                    +
+                </div>
             </div>
         </div>
         </div>
@@ -17,9 +23,10 @@
 </template>
 
 <script>
+import FontAwesomeIcon from "@fortawesome/vue-fontawesome";
 export default {
   name: "Node",
-  components: {},
+  components: { FontAwesomeIcon },
   data: function() {
     return {
       dataTitle: this.node.title.slice(0),
@@ -27,7 +34,7 @@ export default {
     };
   },
   computed: {},
-  props: ["node", "update"]
+  props: ["node", "update", "addChild", "deleteNode"]
 };
 </script>
 
@@ -44,6 +51,23 @@ textarea {
 input:focus,
 textarea:focus {
   outline: none;
+}
+
+.addChild {
+  margin: 5px 0;
+  box-sizing: border-box;
+  text-align: center;
+  min-width: 30px;
+  padding-top: 2.5px;
+  min-height: 30px;
+  border-radius: 20px;
+  font-weight: bold;
+  background-color: #ffffff;
+}
+
+.addChild:hover {
+  cursor: pointer;
+  background-color: #ffffffbb;
 }
 
 .box {
@@ -66,6 +90,10 @@ textarea:focus {
 .controls {
   width: 25px;
   margin: 5px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
 .description {
   flex-grow: 2;

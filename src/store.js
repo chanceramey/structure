@@ -22,7 +22,8 @@ export default new Vuex.Store({
         registerError: state => state.registerError,
         generalError: state => state.generalError,
         boards: state => state.boards,
-        currentBoard: state => state.currentBoard
+        currentBoard: state => state.currentBoard,
+        currentStructure: state => state.currentBoard && JSON.parse(state.currentBoard.structure)
     },
     mutations: {
         setUser(state, user) {
@@ -117,7 +118,7 @@ export default new Vuex.Store({
             })
         },
         saveBoard(context, board) {
-            axios.put(`/api/${context.state.user.id}/boards/${board.id}`, board).then(response => {
+            axios.put(`/api/${context.state.user.id}/boards/${context.state.currentBoard.id}`, board).then(response => {
 
             }).catch(error => {
                 if (error.response) {

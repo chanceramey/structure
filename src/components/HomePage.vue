@@ -1,8 +1,8 @@
 <template>
   <div>
     <div v-if="loggedIn">
-      <boards v-if="!currentBoard"/>
-      <structure v-else /></stucture> 
+      <workspace v-if="!currentBoard"/>
+      <board v-else />
     </div>
     <div v-else>
       <welcome-page/>
@@ -12,11 +12,11 @@
 
 <script>
 import WelcomePage from './WelcomePage';
-import Boards from './Boards'
-import Structure from './Structure'
+import Board from './Board'
+import Workspace from './Workspace'
 export default {
   name: "HomePage",
-  components: { WelcomePage, Boards, Structure },
+  components: { WelcomePage, Board, Workspace },
   computed: {
     loggedIn: function() {
       return this.$store.getters.loggedIn;

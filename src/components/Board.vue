@@ -2,26 +2,22 @@
   <div>
       <button v-on:click="backToBoards()" class="alternate narrow">Back to my boards</button>
       <title></title>
-      <h1>{{currentBoard.title}}</h1>
-      <h3>{{currentBoard.description}}</h3>
-      <Tree></Tree>
+      <Structure></Structure>
   </div>
 </template>
 
 <script>
 import Node from "./Node";
 import Vue from "vue";
-import Tree from "./Tree"
+import Structure from "./Structure";
 export default {
-  name: "Structure",
+  name: "Board",
   components: { Node },
-  created: function() {
-  },
+  created: function() {},
   computed: {
     currentBoard() {
       return this.$store.getters.currentBoard;
-    },
-    generateTree() {}
+    }
   },
   methods: {
     backToBoards: function() {
@@ -32,11 +28,11 @@ export default {
 </script>
 
 <style scoped>
-.tree {
-    background-color: #222;
+.structure {
+  background-color: #222;
 }
 
-.alt .tree {
-    background-color: #fff;
+.alt .structure {
+  background-color: #fff;
 }
 </style>

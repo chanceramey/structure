@@ -43,7 +43,7 @@ app.get('/api/:user_id/boards/:board_id', (req, res) => {
 
 // Create a new board
 app.post('/api/:user_id/boards', (req, res) => {
-    if (!req.body.title)
+    if (!req.body.structure)
         return res.status(400).send();
     let user_id = parseInt(req.params.user_id);
     console.log(`User id is ${user_id}`);
@@ -51,9 +51,7 @@ app.post('/api/:user_id/boards', (req, res) => {
         console.log(`User #${user} found.`)
         return knex('boards').insert({
             user_id,
-            title: req.body.title,
-            description: req.body.description,
-            tree: req.body.tree
+            structure: JSON.stringify(req.body.structure)
         })
     }).then(ids => {
         console.log('Inserted successfully')
@@ -68,22 +66,22 @@ app.post('/api/:user_id/boards', (req, res) => {
 
 // Update a board
 app.put('/api/user_id/boards/:board_id', (req, res) => {
-    if (!req.body.tree)
+    if (!req.body.structure)
         return res.status(400).send('You must create a structure');
     const user_id = req.params.user_id;
     const id = req.params.board_id;
-    const tree = req.body.tree;
+    const structure = req.body.structure;
     console.log(`updating board ${id} for user ${user_id}`);
     knex('boards').where({ user_id }).andWhere({ id }).then(boards => {
         const board = boards[0];
         if (!board) {
             res.status(404).send('Sorry, we couldn\'t find that board in your list.')
             throw new Error('Bad request');
-        } else if (board.tree = req.body.tree) {
+        } else if (board.structure = req.body.structure) {
             res.status(304).send('Already up to date!')
             return Promise.resolve(null);
         } else {
-            return knex('boards').where({ id: board.id }).update({ tree });
+            return knex('boards').where({ id: board.id }).update({ structure });
         }
         res.status(200).json({ board })
     }).then(response => {
