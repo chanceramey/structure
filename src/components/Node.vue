@@ -16,7 +16,7 @@
                   :ref="titleId"/>
                 <textarea class="description" 
                   type="textarea" 
-                  v-if="showDescription || dataDescription" 
+                  v-show="showDescription || dataDescription" 
                   v-model="dataDescription" 
                   v-on:change="update(node, {description: dataDescription})"
                   @click="toggleDescription(true)"
@@ -72,7 +72,7 @@ export default {
         this.showDescription = value;
       } else if (!this.showDescription) {
         this.showDescription = value;
-        console.log(this.$refs[this.descriptionId], this.$refs, this.descriptionId)
+        console.log(this.$refs[this.descriptionId])
         this.$refs[this.descriptionId].focus();
 
       }

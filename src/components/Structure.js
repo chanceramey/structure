@@ -92,8 +92,8 @@ export default Vue.component("Structure", {
         updateNode: function (nodeObject, newNodeValues) {
             if (newNodeValues.title) nodeObject.title = newNodeValues.title;
             if (newNodeValues.description) nodeObject.description = newNodeValues.description;
-            this.$store.dispatch("saveBoard", this.testBoard)
-            console.log(JSON.stringify(this.testBoard, null, 4));
+            this.$store.dispatch("saveBoard", this.mutableStructure)
+            console.log(JSON.stringify(this.mutableStructure, null, 4));
         },
         pushChild: function (nodeObject) {
             console.log(`Before: ${JSON.stringify(this.mutableStructure, null, 4)}`)
