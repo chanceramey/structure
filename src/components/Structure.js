@@ -6,10 +6,11 @@ import Node from "./Node";
 // X Create a board should take you directly to the board
 // X Start with title only, create a description on 'TAB'
 // * Save (w/ autosave) or prompt save (w/out autosave) on logout (on Enter?)
+// * Implement invisible saves to NEVER lose data
 // X Create a sibling with 'ENTER'
 // X Create a child with 'SHIFT-ENTER'
 // * Control how to tabbing through tree works
-// * Focus on title when a new item is created
+// X Focus on title when a new item is created
 // * Allow reordering of siblings
 // * Delete a parent and ask what to do with childen (delete)
 // * Fix Workspace so that it expands with structure
@@ -18,9 +19,9 @@ import Node from "./Node";
 // * Fix save feature
 // X Fix delete feature
 // * Add lines to structures
-// * Filter all inputs to check for SQL injections
+// * Filter all inputs and endpoints (middleware?) to check for SQL injections
 // X Remove board title and description and make them part of the root node
-// * Add JS Web Token to front and backend
+// X Add JS Web Token to front and backend
 // * Fix login password field
 // * Figure out the best way to way a todo list (allow for sub-structures/hidden structures?)
 // * Configure database to work with larger structures
@@ -34,7 +35,11 @@ import Node from "./Node";
 // * Host on the web
 // * Create instuction modal AND/OR persistent modal
 // * Add font-awesome icons
-// * Fix delete
+// X Fix delete
+// * Restyle boards page
+// * Add animations to new buckets
+// * Create ideal (patentable?) solution for viewing
+// * Create idea (patentable?) navigation, editing, & creation
 
 // Soon
 // * Create invite only access
@@ -81,10 +86,8 @@ export default Vue.component("Structure", {
     },
     methods: {
         deleteMe: function (parent, index) {
-            console.log("deleting node")
             parent && parent.children.splice(index, 1)
-            console.log(JSON.stringify(this.mutableStructure, null, 4));
-
+            this.$store.dispatch("saveBoard", this.mutableStructure)
         },
         generateStructure: function (h) {
             return this.structureHelper(h, this.mutableStructure.root, null, null)
@@ -93,27 +96,23 @@ export default Vue.component("Structure", {
             if (newNodeValues.title) nodeObject.title = newNodeValues.title;
             if (newNodeValues.description) nodeObject.description = newNodeValues.description;
             this.$store.dispatch("saveBoard", this.mutableStructure)
-            console.log(JSON.stringify(this.mutableStructure, null, 4));
         },
         pushChild: function (nodeObject) {
-            console.log(`Before: ${JSON.stringify(this.mutableStructure, null, 4)}`)
             if (!nodeObject.children) nodeObject.children = [];
             nodeObject.children.push({
                 title: '',
                 description: '',
                 children: []
             });
-            console.log(`After: ${JSON.stringify(this.mutableStructure, null, 4)}`)
-
+            this.$store.dispatch("saveBoard", this.mutableStructure)
         },
         pushSibling: function (parent) {
-            console.log(parent)
             parent && parent.children.push({
                 title: '',
                 description: '',
                 children: []
             });
-            console.log(JSON.stringify(this.mutableStructure, null, 4));
+            this.$store.dispatch("saveBoard", this.mutableStructure)
         },
         structureHelper: function (h, node, parent, index) {
             if (!node) return;

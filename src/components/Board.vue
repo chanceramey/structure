@@ -30,6 +30,8 @@ export default {
 <style scoped>
 .structure {
   background-color: #222;
+  display: table;
+  width: 100%;
 }
 
 .alt .structure {
