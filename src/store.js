@@ -158,6 +158,18 @@ export default new Vuex.Store({
                         return;
                     }
                 })
+        },
+        deleteBoard(context, id) {
+            axios.delete(`/api/${context.state.user.id}/boards/${id}`, getAuthHeader())
+                .then(response => {
+                    context.dispatch('getBoards');
+                }).catch(error => {
+                    if (error.response) {
+                        if (error.response.status === 403 || error.response.status === 400)
+                            context.commit('setGeneralError', `Error deleting board ${error.response}`);
+                        return;
+                    }
+                })
         }
     }
 });

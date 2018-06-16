@@ -4,15 +4,12 @@
         <div class="perimeter" v-if="!dragging">
             <div class="box" 
               draggable="true" 
-              v-on:drag="drag()"
-              @keydown.shift.space="addChild(node)"                  
-               @keydown.shift.enter="addSibling(parent)">
+              v-on:drag="drag()">
                 <input class="title" 
                   v-model="dataTitle" 
                   v-on:change="update(node, {title: dataTitle})"
-                  @keydown.shift.tab.prevent="toggleDescription(true)"
+                  @keydown="create"
                   @click="toggleDescription(false)"
-                  :disabled="!parent"
                   :ref="titleId"/>
                 <textarea class="description" 
                   type="textarea" 
@@ -20,17 +17,17 @@
                   v-model="dataDescription" 
                   v-on:change="update(node, {description: dataDescription})"
                   @click="toggleDescription(true)"
-                  :disabled="!parent"
+                  @keydown="navigate"
                   :ref="descriptionId"/>
             </div>
             <div class="controls">
-                <div class="addChild" v-if="parent" v-on:click="addSibling(parent)">
+                <div class="controlButton" v-if="parent" v-on:click="addSibling(parent)">
                   >
                 </div>
-                <div class="addChild" v-if="parent" v-on:click="deleteNode(parent, index)">
+                <div class="controlButton" v-if="parent" v-on:click="deleteNode(parent, index)">
                   -
                 </div>
-                <div class="addChild" v-on:click="addChild(node)">
+                <div class="controlButton" v-on:click="addChild(node)">
                     +
                 </div>
             </div>
@@ -43,17 +40,30 @@
 </template>
 
 <script>
+/****************** IP ******************/
+/* ------ Creation ------ */
+// X Enter -> New sibling
+// X Shift + Enter  -> New child of first sibling
+// 0 Shift + Space  -> New child of next sibling
+// 0 Tab            -> Description -> Right -> Description -> Down -> Description -> Right ...
+// X Shift + Tab    -> New child
+/* ------ Navigation ------ */
+// (with highlight/obvious effect on focus)
+// 0 Left-arrow     -> Left sibling or last child of left uncle
+// 0 Right-arrow    -> Right sibling or first child of right uncle
+/****************************************/
+
 import FontAwesomeIcon from "@fortawesome/vue-fontawesome";
-import uid from 'uid';
+import uid from "uid";
 
 export default {
   name: "Node",
   components: { FontAwesomeIcon },
-  created: function () {
+  created: function() {
     this.titleId = uid();
     this.descriptionId = uid();
   },
-  mounted: function () {
+  mounted: function() {
     this.$refs[this.titleId].focus();
   },
   data: function() {
@@ -62,26 +72,57 @@ export default {
       dataDescription: this.node.description.slice(0),
       dragging: false,
       showDescription: false,
-      titleId: '',
-      descriptionId: ''
+      titleId: "",
+      descriptionId: ""
     };
   },
   methods: {
-    toggleDescription (value) {
+    toggleDescription(value) {
       if (!this.dataDescription && this.showDescription) {
         this.showDescription = value;
+        value && this.$refs[this.descriptionId].focus();
       } else if (!this.showDescription) {
         this.showDescription = value;
-        console.log(this.$refs[this.descriptionId])
-        this.$refs[this.descriptionId].focus();
-
+        value && this.$refs[this.descriptionId].focus();
       }
     },
-    drag (ev){
+    drag(ev) {
       // this.dragging = true;
     },
-    drop (ev) {
+    drop(ev) {
       this.dragging = false;
+    },
+    create(e) {
+      switch (e.key) {
+        case "Enter":
+          if (!e.shiftKey) this.addSibling(this.parent);
+          else this.addChild(this.parent.children[0]);
+          break;
+        case " ":
+          if (e.shiftKey) console.log("implement add cousin");
+          break;
+        case "Tab":
+          e.preventDefault();
+          if (e.shiftKey) this.addChild(this.node);
+          else this.toggleDescription(true);
+          console.log(e);
+          break;
+      }
+    },
+    navigate(e) {
+      switch (e.key) {
+        case "Enter":
+          if (!e.shiftKey) this.addSibling(this.parent);
+          else this.addChild(this.parent.children[0]);
+          break;
+        case " ":
+          if (e.shiftKey) console.log("implement add cousin");
+          break;
+        case "Tab":
+          if (e.shiftKey) this.addChild(this.node);
+          else console.log("Implement navigate to cousin");
+          break;
+      }
     }
   },
   computed: {},
@@ -112,7 +153,7 @@ textarea:focus {
   outline: none;
 }
 
-.addChild {
+.controlButton {
   margin: 5px 0;
   box-sizing: border-box;
   text-align: center;
@@ -121,12 +162,12 @@ textarea:focus {
   min-height: 30px;
   border-radius: 20px;
   font-weight: bold;
-  background-color: #ffffff;
+  color: #CFCFCF;
 }
 
-.addChild:hover {
+.controlButton:hover {
   cursor: pointer;
-  background-color: #ffffffbb;
+  color: #fff;
 }
 
 .box {
@@ -135,10 +176,11 @@ textarea:focus {
   height: 150px;
   display: flex;
   flex-direction: column;
-  border-radius: 20px;
+  border-radius: 2px;
   text-align: center;
   overflow: hidden;
-  background-color: #ffffffbb;
+  background-color: transparent;
+  border: 1pt solid #CFCFCF;
 }
 .children {
   margin: 5px;
@@ -155,10 +197,13 @@ textarea:focus {
   justify-content: center;
 }
 .description {
+  color: #CFCFCF;
   flex-grow: 2;
   padding: 10px;
   font-weight: lighter;
-  min-height: 50px;
+  resize: none;
+  border-top: 1pt solid #CFCFCF;
+
 }
 .offspring {
   margin: 5px;
@@ -179,9 +224,13 @@ textarea:focus {
 .title {
   flex-grow: 1;
   padding: 10px;
-  background-color: #fff;
+  background-color: transparent;
   font-weight: bold;
   text-align: center;
+  margin: 0px;
+}
+.title:focus {
+  box-shadow: none;
 }
 
 .alt .box {

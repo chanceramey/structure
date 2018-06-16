@@ -1,22 +1,32 @@
 <template>
-  <div class="boards">
+  <div class="workspace">
       <h1>Welcome to your workspace! Here is a list of your boards:</h1>
-      <div v-for="(board, index) in boards" v-on:click="choose(board)">{{index+1}}. {{JSON.parse(board.structure).root.title}}: {{JSON.parse(board.structure).root.description && JSON.parse(board.structure).root.description}}</div>
-      <div>
+      <div class="boards">
+      <div class="boardList">
+      <div v-for="(board, index) in boards">
+        <board-card v-bind:board="board"></board-card>
+      </div>
+      </div>
+      <div class="creationStation">
           <input type="text" placeholder="Title" v-model="title"/>
           <input type="textarea" placeholder="Description" v-model="description"/>
           <button v-on:click="createBoard()" class="alternate narrow">Create Board</button>
+      </div>
       </div>
   </div>
 </template>
 
 <script>
+import BoardCard from './BoardCard'
 export default {
   name: "Workspace",
   computed: {
     boards: function() {
       return this.$store.getters.boards;
     }
+  },
+  components: {
+    BoardCard
   },
   created: function() {
     this.getBoards();
@@ -44,12 +54,34 @@ export default {
       this.title = "";
       this.description = "";
     },
-    choose(board) {
-      this.$store.commit("setCurrentBoard", board);
+    getBoard(board) {
+      const id = board.id;
+      const boardRoot = JSON.parse(board.structure).root;
+      const title = boardRoot.title;
+      const description = boardRoot.description;
+      return {id, title, description};
     }
   }
 };
 </script>
 
 <style scoped>
+.boards {
+  display: flex;
+  flex-direction: row;
+}
+.boardList {
+  display: grid;
+  grid-template-columns: auto auto auto;
+}
+.creationStation {
+  margin: 20px;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+.workspace {
+  display: flex;
+  flex-direction: column;
+}
 </style>

@@ -4,11 +4,11 @@
     <h2>Get started. It's totally free.</h2>
     <form v-on:submit.prevent="register">
       <p>Create an account.</p>
-      <input class="narrow" v-model="first_name" placeholder="First Name">
-      <input class="narrow" v-model="last_name" placeholder="Last Name"><br/><br/>
-      <input class="narrow" v-model="email" placeholder="Email Address">
-      <input class="narrow" type="password" v-model="password" placeholder="Password"><br/><br/>
-      <button class="alternate narrow" type="submit">Register</button>
+      <input class="wide" v-model="first_name" placeholder="First Name"><br/>
+      <input class="wide" v-model="last_name" placeholder="Last Name"><br/>
+      <input class="wide" v-model="email" placeholder="Email Address"><br/>
+      <input class="wide" type="password" v-model="password" placeholder="Password"><br/>
+      <button class="primary wide" type="submit">Register</button>
     </form>
     <p class="error">{{registerError}}</p>
   </div>
@@ -50,7 +50,9 @@ export default {
 img {
   width: 100px;
 }
-
+form {
+  width: 300px;
+}
 h1 {
   margin-bottom: 0px;
 }
@@ -64,6 +66,6 @@ h2 {
   width: 170px;
 }
 .wide {
-  width: 370px;
+  width: 100%;
 }
 </style>

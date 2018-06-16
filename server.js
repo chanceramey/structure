@@ -48,7 +48,7 @@ app.get('/api/:user_id/boards', verifyToken, (req, res) => {
         return;
     }
     console.log(`getting all boards for ${user_id}`);
-    knex('boards').where({ user_id }).then(boards => {
+    knex('boards').where({ user_id }).andWhere({ deleted: false }).then(boards => {
         res.status(200).json({ boards })
     }).catch(error => {
         res.status(500).json({ error });
@@ -99,6 +99,29 @@ app.post('/api/:user_id/boards', verifyToken, (req, res) => {
     });
 });
 
+app.delete('/api/:user_id/boards/:id', verifyToken, (req, res) => {
+    console.log('method found')
+    const user_id = Number(req.params.user_id);
+    if (user_id !== req.userID) {
+        res.status(403).send();
+        return;
+    }
+    const id = req.params.id;
+    console.log(`deleting board ${id} for ${user_id}`);
+    knex('boards').where({ user_id }).andWhere({ id }).then(boards => {
+        const board = boards[0];
+        if (!board) {
+            throw new Error('Bad request - Sorry, we couldn\'t find that board in your list.');
+        } else {
+            knex('boards').where({ id }).update({ deleted: true }).then(board => {
+                res.status(200).json({ board })
+            })
+        }
+    }).catch(error => {
+        res.status(500).json({ error });
+    })
+});
+
 // Update a board
 app.put('/api/:user_id/boards/:board_id', verifyToken, (req, res) => {
     const user_id = Number(req.params.user_id);
@@ -116,8 +139,7 @@ app.put('/api/:user_id/boards/:board_id', verifyToken, (req, res) => {
         const board = boards[0];
         console.log(boards);
         if (!board) {
-            res.status(404).send('Sorry, we couldn\'t find that board in your list.')
-            throw new Error('Bad request');
+            throw new Error('Bad request - Sorry, we couldn\'t find that board in your list.');
         } else if (board.structure === req.body.structure) {
             res.status(304).send('Already up to date!')
             return Promise.resolve(null);
