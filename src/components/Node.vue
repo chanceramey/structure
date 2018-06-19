@@ -19,21 +19,24 @@
                   @click="toggleDescription(true)"
                   @keydown="navigate"
                   :ref="descriptionId"/>
-            </div>
-            <div class="controls">
-                <div class="controlButton" v-if="parent" v-on:click="addSibling(parent)">
-                  >
-                </div>
-                <div class="controlButton" v-if="parent" v-on:click="deleteNode(parent, index)">
-                  -
-                </div>
-                <div class="controlButton" v-on:click="addChild(node)">
-                    +
-                </div>
+                  <div class="controls">
+                    <div class="controlButton" v-on:click="addChild(node)">
+                      +
+                    </div>
+                    <div class="controlButton" v-if="parent" v-on:click="deleteNode(parent, index)">
+                      -
+                    </div>
+                    <div class="controlButton" v-if="(parent && node.children.length)" v-on:click="showChildren = !showChildren">
+                      {{showChildren ? 'H' : 'S'}}
+                    </div>
+                    <div class="controlButton" v-if="parent" v-on:click="addSibling(parent)">
+                      >
+                    </div>
+                  </div>
             </div>
         </div>
         </div>
-        <div class="children">
+        <div class="children" v-if="showChildren">
             <slot></slot>
         </div>
     </div>
@@ -73,7 +76,8 @@ export default {
       dragging: false,
       showDescription: false,
       titleId: "",
-      descriptionId: ""
+      descriptionId: "",
+      showChildren: true
     };
   },
   methods: {
@@ -176,6 +180,7 @@ textarea:focus {
   height: 150px;
   display: flex;
   flex-direction: column;
+  align-items: center;
   border-radius: 2px;
   text-align: center;
   overflow: hidden;
@@ -189,14 +194,17 @@ textarea:focus {
   flex-direction: row;
 }
 .controls {
-  width: 25px;
-  margin: 5px;
   display: flex;
-  flex-direction: column;
+  width: 100%;
+  flex-direction: row;
   align-items: center;
   justify-content: center;
+  z-index: 0;
 }
+
 .description {
+  box-sizing: border-box;
+  width: 100%;
   color: #CFCFCF;
   flex-grow: 2;
   padding: 10px;
@@ -228,6 +236,7 @@ textarea:focus {
   font-weight: bold;
   text-align: center;
   margin: 0px;
+  overflow-wrap: break-word;
 }
 .title:focus {
   box-shadow: none;

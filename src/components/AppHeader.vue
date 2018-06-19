@@ -98,10 +98,10 @@ li {
   font-style: italic;
   font-size: 24px;
   letter-spacing: .1em;
-  border: 1pt solid #666;
+  border: 1pt solid #CFCFCF;
   border-radius: 2px;
   padding: 10px;
-  color: #666;
+  color: #CFCFCF;
 }
 
 .logo:hover {
@@ -115,7 +115,7 @@ form {
 }
 li a {
   text-decoration: none;
-  color: #666;
+  color: #CFCFCF;
 }
 
 li a:hover {
