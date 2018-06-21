@@ -1,10 +1,10 @@
+// tsconfig.json
 {
-    "compilerOptions": {
-        "outDir": "./built",
-        "allowJs": true,
-        "target": "es5"
-    },
-    "include": [
-        "./src/**/*"
-    ]
+  "compilerOptions": {
+    "target": "es5",
+    "strict": true,
+    "lib": ["es2015"],
+    "module": "es2015",
+    "moduleResolution": "node"
+  }
 }
