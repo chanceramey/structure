@@ -53,7 +53,7 @@ const createBoard = (req: APIRequest, res: APIResponse) => {
             user_id,
             structure: JSON.stringify(req.body.structure)
         })
-    }).then((ids: Number[]) => {
+    }).then((ids: number[]) => {
         console.log('Inserted successfully')
         return knex('boards').where('id', ids[0]).first();
     }).then((board: Board) => {

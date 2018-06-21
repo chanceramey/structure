@@ -6,6 +6,8 @@ export interface APIRequest extends Express.Request {
 
 export interface APIResponse extends Express.Response { }
 
+export interface APIMiddware extends Express.NextFunction {}
+
 export interface BasicRecord {
     id: number;
     created_at: Date;
