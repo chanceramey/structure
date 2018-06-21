@@ -1,11 +1,17 @@
 import Vue from "vue";
 import Node from "./Node";
+import Modal from "./Modal";
 
 export default Vue.component("Structure", {
     render: function (h) {
         let structure = this.generateStructure(h);
         return (
             <div class="structure">
+            {this.deleteModal && <Modal onRequestClose={() => this.toggleModal()}>
+                <h2>What would you like to do with this node's children?</h2>
+                <button class="alternate" onClick={this.deleteMe()}>Append child nodes to grandparent</button>
+                <button class="harsh">Delete all child nodes</button>
+            </Modal>}
                 {structure}
             </div>
         );
@@ -20,12 +26,30 @@ export default Vue.component("Structure", {
     },
     data: function () {
         return {
-            mutableStructure: {}
+            mutableStructure: {},
+            deleteModal: false,
+            parent: {},
+            index: {}
         }
     },
     methods: {
-        deleteMe: function (parent, index) {
-            parent && parent.children.splice(index, 1)
+        toggleModal: function(value, parent, index) {
+            if (parent) this.parent = parent;
+            if (index) this.index = index;
+            console.log("calling toggle modal")
+            this.deleteModal = value !== undefined ? value : !this.deleteModal; 
+            console.log(this.deleteModal)
+        },
+        deleteMe: function () {
+            const parent = this.parent;
+            const index = this.index;
+            parent && parent.children && parent.children.splice(index, 1)
+            this.$store.dispatch("saveBoard", this.mutableStructure)
+        },
+        deleteJustMe: function () {
+            const toDelete = parent && parent.children[index]
+            parent && parent.children && parent.children.splice(index, 1)
+            parent.children = [...parent.children, ...toDelete.children];
             this.$store.dispatch("saveBoard", this.mutableStructure)
         },
         generateStructure: function (h) {
@@ -53,6 +77,16 @@ export default Vue.component("Structure", {
             });
             this.$store.dispatch("saveBoard", this.mutableStructure)
         },
+        reorder: function (parent, index) {
+            if (!parent || !parent.children) return;
+            const node = parent.children[index];
+            parent.children.splice(index, 1);
+            if (index === 0) parent.children.push(node);
+            else parent.children.splice(index - 1, 0, node);
+            console.log(JSON.stringify(parent, undefined, 4))
+            this.$store.dispatch("saveBoard", this.mutableStructure)
+            this.triggerRefresh = new Date().getMilliseconds();
+        },
         structureHelper: function (h, node, parent, index) {
             if (!node) return;
             let children = [];
@@ -64,12 +98,15 @@ export default Vue.component("Structure", {
             }
             return (
                 <Node node={node}
+                    toggleModal={this.toggleModal}
                     parent={parent}
                     index={index}
                     update={this.updateNode}
                     addChild={this.pushChild}
                     deleteNode={this.deleteMe}
-                    addSibling={this.pushSibling}>
+                    deleteThisNodeOnly={this.deleteJustMe}
+                    addSibling={this.pushSibling}
+                    reorder={this.reorder}>
                     {children}
                 </Node>
             )

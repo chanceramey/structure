@@ -51,6 +51,18 @@
     border: none;
  }
 
+ button.harsh {
+     border: 1pt solid rgb(216, 73, 73);
+     color: rgb(216, 73, 73);
+     background-color: transparent;
+ }
+
+ button.harsh:hover {
+     background-color: rgb(216, 73, 73);
+     color: #fff;
+     border: none;
+ }
+
  button:focus {
      outline: none;
  }

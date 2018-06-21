@@ -2,10 +2,11 @@
     <div class="offspring" v-if="node">
         <div class="sibling-space">
         <div class="perimeter" v-if="!dragging">
-            <div class="box" 
+            <div class="box"
+              v-if="!isSmall" 
               draggable="true" 
               v-on:drag="drag()">
-                <input class="title" 
+                <input class="title"
                   v-model="dataTitle" 
                   v-on:change="update(node, {title: dataTitle})"
                   @keydown="create"
@@ -20,20 +21,29 @@
                   @keydown="navigate"
                   :ref="descriptionId"/>
                   <div class="controls">
-                    <div class="controlButton" v-on:click="addChild(node)">
-                      +
+                    <div class="controlButton" v-if="parent && index > 0" v-on:click="reorder(parent, index)">
+                      m
                     </div>
-                    <div class="controlButton" v-if="parent" v-on:click="deleteNode(parent, index)">
-                      -
+                    <div class="controlButton" v-on:click="addChild(node)">
+                      &#43;
+                    </div>
+                    <div class="controlButton" v-if="parent" v-on:click="toggleModal(true, parent, index)">
+                      &#10005;
                     </div>
                     <div class="controlButton" v-if="(parent && node.children.length)" v-on:click="showChildren = !showChildren">
                       {{showChildren ? 'H' : 'S'}}
                     </div>
                     <div class="controlButton" v-if="parent" v-on:click="addSibling(parent)">
-                      >
+                      &#8594;
+                    </div>
+                    <div class="controlButton" v-if="parent" v-on:click="isSmall = true">
+                      &#8595;
                     </div>
                   </div>
             </div>
+            <div class="smallBox" 
+              @click="isSmall = false;"
+              v-else>{{dataTitle}}</div>
         </div>
         </div>
         <div class="children" v-if="showChildren">
@@ -65,6 +75,7 @@ export default {
   created: function() {
     this.titleId = uid();
     this.descriptionId = uid();
+    console.log(JSON.stringify(this.node, undefined, 2))
   },
   mounted: function() {
     this.$refs[this.titleId].focus();
@@ -77,7 +88,8 @@ export default {
       showDescription: false,
       titleId: "",
       descriptionId: "",
-      showChildren: true
+      showChildren: true,
+      isSmall: false
     };
   },
   methods: {
@@ -97,6 +109,7 @@ export default {
       this.dragging = false;
     },
     create(e) {
+      console.log(e);
       switch (e.key) {
         case "Enter":
           if (!e.shiftKey) this.addSibling(this.parent);
@@ -110,6 +123,9 @@ export default {
           if (e.shiftKey) this.addChild(this.node);
           else this.toggleDescription(true);
           console.log(e);
+          break;
+        case "Backspace":
+          if (e.shiftKey) this.deleteNode(this.parent, this.index);
           break;
       }
     },
@@ -126,6 +142,9 @@ export default {
           if (e.shiftKey) this.addChild(this.node);
           else console.log("Implement navigate to cousin");
           break;
+        case "Backspace":
+          if (e.shiftKey) this.deleteNode(this.parent, this.index);
+          break;
       }
     }
   },
@@ -135,9 +154,12 @@ export default {
     "update",
     "addChild",
     "deleteNode",
+    "deleteThisNodeOnly",
     "parent",
     "addSibling",
-    "index"
+    "index",
+    "toggleModal",
+    "reorder"
   ]
 };
 </script>
@@ -161,12 +183,10 @@ textarea:focus {
   margin: 5px 0;
   box-sizing: border-box;
   text-align: center;
-  min-width: 30px;
-  padding-top: 2.5px;
-  min-height: 30px;
   border-radius: 20px;
   font-weight: bold;
-  color: #CFCFCF;
+  color: #cfcfcf;
+  flex-grow: 1;
 }
 
 .controlButton:hover {
@@ -185,7 +205,7 @@ textarea:focus {
   text-align: center;
   overflow: hidden;
   background-color: transparent;
-  border: 1pt solid #CFCFCF;
+  border: 1pt solid #cfcfcf;
 }
 .children {
   margin: 5px;
@@ -205,13 +225,12 @@ textarea:focus {
 .description {
   box-sizing: border-box;
   width: 100%;
-  color: #CFCFCF;
+  color: #cfcfcf;
   flex-grow: 2;
   padding: 10px;
   font-weight: lighter;
   resize: none;
-  border-top: 1pt solid #CFCFCF;
-
+  border-top: 1pt solid #cfcfcf;
 }
 .offspring {
   margin: 5px;
@@ -228,6 +247,12 @@ textarea:focus {
   margin: 5px;
   display: flex;
   justify-content: center;
+}
+.smallBox {
+  padding: 5px;
+  border: 1pt solid #cfcfcf;
+  border-radius: 2px;
+  margin: 5px;
 }
 .title {
   flex-grow: 1;
